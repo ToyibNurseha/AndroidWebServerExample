@@ -8,10 +8,22 @@ import android.os.PowerManager.WakeLock
 import android.view.View
 import android.view.WindowManager
 import android.webkit.WebSettings
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_web_server.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class WebServerActivity : AppCompatActivity() {
+
+    private lateinit var httpClient: OkHttpClient
+    private lateinit var viewModel: WebViewModel
 
     @SuppressLint("SetJavaScriptEnabled", "InvalidWakeLockTag", "WakelockTimeout")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +31,20 @@ class WebServerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_web_server)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         showSystemUI()
+
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        ).get(WebViewModel::class.java)
+        viewModel.startSocket()
+        viewModel.getToken().observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            webViewLoad(it)
+        })
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun webViewLoad(gameToken: String){
 
         webView.settings.javaScriptEnabled = true
         webView.settings.loadWithOverviewMode = true
@@ -28,10 +54,9 @@ class WebServerActivity : AppCompatActivity() {
         val getPath = filesDir.path + "/cache"
         webView.settings.setAppCachePath(getPath)
         webView.settings.cacheMode = WebSettings.LOAD_DEFAULT
-        val pathInternal = "file:///android_asset/index.html"
+        val pathInternal = "http://gametest2.lyto.gilangprambudi.net/"
 
-        webView.loadUrl(pathInternal)
-
+        webView.loadUrl("$pathInternal/?user-game-token=$gameToken")
     }
 
     private fun showSystemUI() {

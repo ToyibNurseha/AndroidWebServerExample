@@ -38,16 +38,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val request = DownloadManager.Request(Uri.parse(url)) as DownloadManager.Request
+//        val request = DownloadManager.Request(Uri.parse(url)) as DownloadManager.Request
 
-        request.setTitle("ini judul")
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "game_lyto.zip")
-        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        manager.enqueue(request)
-        btnDownload.setOnClickListener {
-            manager.enqueue(request)
-        }
+//        request.setTitle("ini judul")
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "game_lyto.zip")
+//        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+//        manager.enqueue(request)
+//        btnDownload.setOnClickListener {
+//            manager.enqueue(request)
+//        }
 
 
         //        embeddedServer(Netty, 8080) {

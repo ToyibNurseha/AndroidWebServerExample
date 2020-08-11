@@ -44,6 +44,7 @@ class NanoActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        server = WebServer()
         server.stop()
         super.onDestroy()
     }
@@ -58,10 +59,10 @@ class NanoActivity : AppCompatActivity() {
             var answer: String? = ""
             try {
                 // Open file from SD Card
-                val root = Environment.getExternalStorageDirectory()
+                val root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 Log.d("ROOT", "serve: $root")
                 val index = FileReader (
-                    "file:///android_asset/index.html"
+                    "$root/index.html"
                 )
                 val reader = BufferedReader(index)
                 var line: String? = ""
