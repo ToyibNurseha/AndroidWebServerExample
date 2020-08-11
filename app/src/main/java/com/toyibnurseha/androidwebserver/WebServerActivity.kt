@@ -29,9 +29,13 @@ class WebServerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_server)
+        getGameToken()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         showSystemUI()
+        getResult()
+    }
 
+    private fun getGameToken(){
         viewModel = ViewModelProvider(
             this,
             ViewModelProvider.NewInstanceFactory()
@@ -57,6 +61,14 @@ class WebServerActivity : AppCompatActivity() {
         val pathInternal = "http://gametest2.lyto.gilangprambudi.net/"
 
         webView.loadUrl("$pathInternal/?user-game-token=$gameToken")
+    }
+
+    private fun getResult(){
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(WebViewModel::class.java)
+        viewModel.startSocket()
+        viewModel.getScores().observe(this, Observer {
+            Toast.makeText(this@WebServerActivity, "$it", Toast.LENGTH_SHORT).show()
+        })
     }
 
     private fun showSystemUI() {

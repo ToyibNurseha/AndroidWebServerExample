@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import okhttp3.WebSocket
 import okio.ByteString
@@ -14,6 +16,7 @@ class WebViewModel : ViewModel() {
 
     private lateinit var httpClient: OkHttpClient
     private val gameToken = MutableLiveData<String>()
+    private val responseScore = MutableLiveData<ArrayList<ResponseModel>>()
 
     inner class WebSocketListen() : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket?, response: Response?) {
@@ -44,16 +47,22 @@ class WebViewModel : ViewModel() {
                 val url = text?.replaceFirst("/room-session-finish", "")
                 val obj = JSONObject(url)
                 val playerScores = obj.getJSONArray("player_score_summaries")
-                for (i in 0 until playerScores.length()) {
-                    val item = playerScores.getJSONObject(i)
-                    val score = item.getInt("score")
-                    val winStatus = item.getInt("win_status")
-                    val userId = item.getInt("user_id")
-                    Log.d(ContentValues.TAG, "onMessage: $score")
-                    Log.d(ContentValues.TAG, "onMessage: $winStatus")
-                    Log.d(ContentValues.TAG, "onMessage: $userId")
-                    val output = "$score, $winStatus, $userId"
-                }
+
+                val responseListener: ArrayList<ResponseModel> =
+                    Gson().fromJson(playerScores.toString(), object : TypeToken<ArrayList<ResponseModel>>() {}.type)
+                responseScore.postValue(responseListener)
+
+//                for (i in 0 until playerScores.length()) {
+//                    val item = playerScores.getJSONObject(i)
+//                    val score = item.getInt("score")
+//                    val winStatus = item.getInt("win_status")
+//                    val userId = item.getInt("user_id")
+//                    Log.d(ContentValues.TAG, "onMessage: $score")
+//                    Log.d(ContentValues.TAG, "onMessage: $winStatus")
+//                    Log.d(ContentValues.TAG, "onMessage: $userId")
+//                    val output = "$score, $winStatus, $userId"
+//                    responseScore.postValue()
+//                }
 
                 super.onMessage(webSocket, text)
             }
@@ -77,5 +86,10 @@ class WebViewModel : ViewModel() {
         val ws = httpClient
         ws.newWebSocket(request, listener)
         httpClient.dispatcher()?.executorService()?.shutdown()
+    }
+
+
+    fun getScores() : LiveData<ArrayList<ResponseModel>> {
+        return responseScore
     }
 }
